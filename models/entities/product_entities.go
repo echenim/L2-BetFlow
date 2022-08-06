@@ -13,11 +13,15 @@ type Product struct {
 	DeletedAt   string  `json:"deleted_at"`
 }
 
-var ProductList = []*Product{
+func GetProducts() []*Product {
+	return productList
+}
+
+var productList = []*Product{
 	{
 		Id:          1,
 		Name:        "Latte",
-		Description: "Coffee",
+		Description: "Fronthy milk Coffee",
 		Price:       1.00,
 		SKU:         "1",
 		CreatedAt:   time.Now().UTC().String(),
@@ -25,9 +29,9 @@ var ProductList = []*Product{
 	},
 	{
 		Id:          2,
-		Name:        "Latte",
-		Description: "Coffee",
-		Price:       1.00,
+		Name:        "Esspresso",
+		Description: "Short and strong Coffee with milk",
+		Price:       2.45,
 		SKU:         "1",
 		CreatedAt:   time.Now().UTC().String(),
 		UpdatedAt:   time.Now().UTC().String(),
