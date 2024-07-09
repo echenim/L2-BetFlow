@@ -5,6 +5,38 @@
 The real-time betting and settlement system on a Layer 2 (L2) blockchain solution leverages the benefits of L2 scalability, speed, and lower transaction costs while ensuring the security and finality provided by the Layer 1 (L1) blockchain. The system is designed to handle high throughput, low latency, and secure transactions for betting and settlements.
 
 ## Architectural Design Diagramm
+
+
+```plaintext
++------------------+        +------------------+        +------------------+
+|  Web/Mobile UI   | <----> |   API Gateway    | <----> | Backend Services |
++------------------+        +------------------+        +------------------+
+     |                                |                       |
+     v                                v                       v
++-----------+   +-----------+   +-----------+   +-----------+   +-----------+
+| Bet Mgmt  |   | Settlement|   | User Mgmt |   |  Oracle   |   | Analytics |
+|  Service  |   |  Service  |   |  Service  |   |  Service  |   |  Service  |
++-----------+   +-----------+   +-----------+   +-----------+   +-----------+
+     |                                |                       |
+     v                                v                       v
++-----------------------------------------------------------+
+|                     Layer 2 Blockchain                    |
+|      (Smart Contracts, Rollup/Sidechain Mechanisms)       |
++-----------------------------------------------------------+
+     |                                |
+     v                                v
++-----------------------------------------------------------+
+|                     Layer 1 Blockchain                    |
+|                 (Mainnet for Finality)                    |
++-----------------------------------------------------------+
+     |                                |
+     v                                v
++-----------+   +-----------+   +-----------+   +-----------+
+| Relational|   |   NoSQL   |   |  Security |   | Compliance|
+| Database  |   |  Database |   |  & Auth   |   |  Module   |
++-----------+   +-----------+   +-----------+   +-----------+
+```
+
 ```mermaid
 %%{
   init: {
@@ -209,33 +241,4 @@ graph TB
 8. **Real-Time Updates**
    - The WebSocket connection provides users with real-time updates on betting odds, status, and settlements, ensuring a seamless user experience.
 
-## Diagram
 
-```plaintext
-+------------------+        +------------------+        +------------------+
-|  Web/Mobile UI   | <----> |   API Gateway    | <----> | Backend Services |
-+------------------+        +------------------+        +------------------+
-     |                                |                       |
-     v                                v                       v
-+-----------+   +-----------+   +-----------+   +-----------+   +-----------+
-| Bet Mgmt  |   | Settlement|   | User Mgmt |   |  Oracle   |   | Analytics |
-|  Service  |   |  Service  |   |  Service  |   |  Service  |   |  Service  |
-+-----------+   +-----------+   +-----------+   +-----------+   +-----------+
-     |                                |                       |
-     v                                v                       v
-+-----------------------------------------------------------+
-|                     Layer 2 Blockchain                    |
-|      (Smart Contracts, Rollup/Sidechain Mechanisms)       |
-+-----------------------------------------------------------+
-     |                                |
-     v                                v
-+-----------------------------------------------------------+
-|                     Layer 1 Blockchain                    |
-|                 (Mainnet for Finality)                    |
-+-----------------------------------------------------------+
-     |                                |
-     v                                v
-+-----------+   +-----------+   +-----------+   +-----------+
-| Relational|   |   NoSQL   |   |  Security |   | Compliance|
-| Database  |   |  Database |   |  & Auth   |   |  Module   |
-+-----------+   +-----------+   +-----------+   +-----------+
