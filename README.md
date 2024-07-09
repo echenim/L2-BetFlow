@@ -1,5 +1,10 @@
 # Real-Time Betting and Settlement on L2 Solution
 
+## Overview
+
+The real-time betting and settlement system on a Layer 2 (L2) blockchain solution leverages the benefits of L2 scalability, speed, and lower transaction costs while ensuring the security and finality provided by the Layer 1 (L1) blockchain. The system is designed to handle high throughput, low latency, and secure transactions for betting and settlements.
+
+## Architectural Design Diagramm
 ```mermaid
 %%{
   init: {
@@ -58,9 +63,7 @@ graph TB
 
 ```
 
-## Overview
 
-The real-time betting and settlement system on a Layer 2 (L2) blockchain solution leverages the benefits of L2 scalability, speed, and lower transaction costs while ensuring the security and finality provided by the Layer 1 (L1) blockchain. The system is designed to handle high throughput, low latency, and secure transactions for betting and settlements.
 
 ## Components
 
