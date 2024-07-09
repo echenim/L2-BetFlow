@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Betting {
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract Betting is ReentrancyGuard, Ownable {
+    using SafeMath for uint256;
+
     // Structs
     struct Bet {
         address payable bettor;
@@ -19,9 +25,9 @@ contract Betting {
     }
 
     // State variables
-    address public owner;
     uint256 public gameIdCounter;
     mapping(uint256 => Game) public games;
+    address public arbitrator;
 
     // Events
     event GameCreated(uint256 gameId, string description, string[] outcomes);
@@ -38,13 +44,10 @@ contract Betting {
         uint256 payout
     );
     event DisputeRaised(uint256 gameId, address bettor, string reason);
+    event ArbitratorSet(address arbitrator);
+    event BetRefunded(uint256 gameId, address bettor, uint256 amount);
 
     // Modifiers
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only the owner can call this function");
-        _;
-    }
-
     modifier gameExists(uint256 gameId) {
         require(gameId < gameIdCounter, "Game does not exist");
         _;
@@ -64,11 +67,16 @@ contract Betting {
     }
 
     // Constructor
-    constructor() {
-        owner = msg.sender;
+    constructor(address _arbitrator) {
+        arbitrator = _arbitrator;
     }
 
     // Functions
+    function setArbitrator(address _arbitrator) public onlyOwner {
+        arbitrator = _arbitrator;
+        emit ArbitratorSet(_arbitrator);
+    }
+
     function createGame(
         string memory description,
         string[] memory outcomes
@@ -85,7 +93,7 @@ contract Betting {
     function placeBet(
         uint256 gameId,
         string memory outcome
-    ) public payable gameExists(gameId) gameIsActive(gameId) {
+    ) public payable gameExists(gameId) gameIsActive(gameId) nonReentrant {
         require(msg.value > 0, "Bet amount must be greater than zero");
 
         Game storage game = games[gameId];
@@ -97,7 +105,7 @@ contract Betting {
             outcome,
             false
         );
-        game.outcomeBets[outcome] += msg.value;
+        game.outcomeBets[outcome] = game.outcomeBets[outcome].add(msg.value);
 
         emit BetPlaced(gameId, msg.sender, outcome, msg.value);
     }
@@ -105,7 +113,7 @@ contract Betting {
     function settleBet(
         uint256 gameId,
         string memory winningOutcome
-    ) public onlyOwner gameExists(gameId) {
+    ) public onlyOwner gameExists(gameId) nonReentrant {
         Game storage game = games[gameId];
         game.active = false;
 
@@ -117,8 +125,9 @@ contract Betting {
                 keccak256(abi.encodePacked(winningOutcome)) &&
                 !bet.settled
             ) {
-                uint256 payout = (bet.amount / totalBets) *
-                    address(this).balance;
+                uint256 payout = bet.amount.mul(address(this).balance).div(
+                    totalBets
+                );
                 bet.bettor.transfer(payout);
                 bet.settled = true;
 
@@ -134,7 +143,27 @@ contract Betting {
         emit DisputeRaised(gameId, msg.sender, reason);
     }
 
+    function resolveDispute(
+        uint256 gameId,
+        address payable bettor,
+        bool refund
+    ) public {
+        require(
+            msg.sender == arbitrator,
+            "Only the arbitrator can resolve disputes"
+        );
+
+        Bet storage bet = games[gameId].bets[bettor];
+        require(!bet.settled, "Bet already settled");
+
+        if (refund) {
+            bettor.transfer(bet.amount);
+            bet.settled = true;
+            emit BetRefunded(gameId, bettor, bet.amount);
+        }
+    }
+
     function withdrawFunds() public onlyOwner {
-        payable(owner).transfer(address(this).balance);
+        payable(owner()).transfer(address(this).balance);
     }
 }
